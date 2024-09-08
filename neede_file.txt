@@ -1,0 +1,7 @@
+For authentication use ui package
+composer require laravel/ui
+
+generate bootstrape sfolding
+php artisan ui bootstrap --auth
+npm install
+npm run build
