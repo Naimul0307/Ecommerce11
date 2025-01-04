@@ -5,3 +5,5 @@ generate bootstrape sfolding
 php artisan ui bootstrap --auth
 npm install
 npm run build
+refresh migration: php artisan migrate:refresh
+
