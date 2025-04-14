@@ -6,4 +6,5 @@ php artisan ui bootstrap --auth
 npm install
 npm run build
 refresh migration: php artisan migrate:refresh
+install imageintervation package to creat image thumale
 
