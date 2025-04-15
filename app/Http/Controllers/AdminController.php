@@ -6,6 +6,7 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
@@ -46,6 +47,38 @@ class AdminController extends Controller
         $brand->image = $file_name;
         $brand->save();
         return redirect()->route('admin.brands')->with('status','Brand added successfully');
+    }
+
+    public function edit_brand($id)
+    {
+        $brand = Brand::findOrFail($id);
+        return view('admin.edit-brand',compact('brand'));
+    }
+
+
+    public function update_brand_store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required|unique:brands,slug,'.$request->id,
+            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $brand = Brand::findOrFail($request->id);
+        $brand->name = $request->name;
+        $brand->slug = Str::slug($request->name);
+        if ($request->hasFile('image')) {
+            if(File::exists(public_path('uploads/brands/').'/'.$brand->image)){
+                 File::delete(public_path('uploads/brands/').'/'.$brand->image);
+            }
+            $image = $request->file('image');
+            $file_extention = $request->file('image')->extension();
+            $file_name = Carbon::now()->timestamp.'.'.$file_extention;
+            $this->GenerateBrandThumbnailIsImage($image,$file_name);
+            $brand->image = $file_name;
+        }
+        $brand->save();
+        return redirect()->route('admin.brands')->with('status','Brand update successfully');
     }
 
     public function GenerateBrandThumbnailIsImage($image,$imageName)
