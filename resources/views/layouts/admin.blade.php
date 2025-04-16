@@ -83,7 +83,7 @@
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
-                                            <a href="{{ route('admin.add_brand') }}" class="">
+                                            <a href="{{ route('admin.add.brand') }}" class="">
                                                 <div class="text">New Brand</div>
                                             </a>
                                         </li>
@@ -101,12 +101,12 @@
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
-                                            <a href="add-category.html" class="">
+                                            <a href="{{ route('admin.add.category') }}" class="">
                                                 <div class="text">New Category</div>
                                             </a>
                                         </li>
                                         <li class="sub-menu-item">
-                                            <a href="categories.html" class="">
+                                            <a href="{{ route('admin.category') }}" class="">
                                                 <div class="text">Categories</div>
                                             </a>
                                         </li>

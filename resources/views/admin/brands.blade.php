@@ -33,7 +33,7 @@
                             </div>
                         </form>
                     </div>
-                    <a class="tf-button style-1 w208" href="{{ route('admin.add_brand') }}"><i
+                    <a class="tf-button style-1 w208" href="{{ route('admin.add.brand') }}"><i
                             class="icon-plus"></i>Add new</a>
                 </div>
                 <div class="wg-table table-all-user">
@@ -54,6 +54,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @if ($brands->count()>0)
                                 @foreach ( $brands as $brand)
                                 <tr>
                                     <td>{{ $brand->id }}</td>
@@ -69,12 +70,14 @@
                                     <td><a href="#" target="_blank">1</a></td>
                                     <td>
                                         <div class="list-icon-function">
-                                            <a href="{{ route('admin.edit_brand',['id'=>$brand->id]) }}">
+                                            <a href="{{ route('admin.edit.brand',['id'=>$brand->id]) }}">
                                                 <div class="item edit">
                                                     <i class="icon-edit-3"></i>
                                                 </div>
                                             </a>
-                                            <form action="#" method="POST">
+                                            <form action="{{ route('admin.brand.delete',['id'=>$brand->id]) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
                                                 <div class="item text-danger delete">
                                                     <i class="icon-trash-2"></i>
                                                 </div>
@@ -83,6 +86,12 @@
                                     </td>
                                 </tr>
                                 @endforeach
+                                @else
+                                <tr>
+                                    <td colspan="5" class="text-center text-danger">No brands found.</td>
+                                </tr>
+                                @endif
+
                             </tbody>
                         </table>
                     </div>
@@ -95,3 +104,25 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+    $(function(){
+        $('.delete').on('click',function(e){
+            e.preventDefault();
+            var form = $(this).closest('form');
+            swal({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                type:"warning",
+                buttons:["No","Yes"],
+                confirmButtonColor:'#dc3545'
+            }).then(function(result){
+                if (result) {
+                    form.submit();
+                }
+            });
+        });
+    });
+    </script>
+@endpush
