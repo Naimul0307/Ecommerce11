@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -184,6 +185,7 @@ class AdminController extends Controller
         $category->delete();
         return redirect()->route('admin.category')->with('status','Category deleted successfully');
     }
+
     //generate image thumbnail
     public function GenerateCategoryThumbnailIsImage($image,$imageName)
     {
@@ -202,4 +204,16 @@ class AdminController extends Controller
         $img->save($destinationPath.'/'.$imageName);
     }
 
+    public function products()
+    {
+        $products = Product::orderBy('id', 'DESC')->paginate(10);
+        return view('admin.products',compact('products'));
+    }
+
+    public function add_product()
+    {
+        $categories = Category::orderBy('id', 'DESC')->get();
+        $brands = Brand::orderBy('id', 'DESC')->get();
+        return view('admin.add-product',compact('categories','brands'));
+    }
 }
