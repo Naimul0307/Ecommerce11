@@ -38,6 +38,11 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-striped table-bordered">
+                    @if (Session::has('status'))
+                    <p class="alert alert-success text-center">
+                        {{ Session::get('status') }}
+                    </p>
+                    @endif
                     <thead>
                         <tr>
                             <th>Id</th>
@@ -114,28 +119,3 @@
 
 @endsection
 
-@push('scripts')
-    <script>
-        $(function(){
-        $("#myFile").on("change",function(e){
-            const photoInp = $("#myFile");
-            const [file] = this.files;
-            if(file)
-        {
-            $("#imgpreview img").attr("src",URL.createObjectURL(file));
-            $("#imgpreview").show();
-        }
-        });
-        $("input[name='name']").on("change", function() {
-            $("input[name='slug']").val(StringToSlug($(this).val()));
-        });
-    });
-
-    function StringToSlug(Text)
-    {
-        return Text.toLowerCase()
-        .replace(/[^\w]+/g,"")
-        .replace(/ +/g,".");
-    }
-    </script>
-@endpush
