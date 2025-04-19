@@ -70,8 +70,13 @@ class AdminController extends Controller
         $brand->name = $request->name;
         $brand->slug = Str::slug($request->name);
         if ($request->hasFile('image')) {
-            if(File::exists(public_path('uploads/brands/').'/'.$brand->image)){
+            if(File::exists(public_path('uploads/brands/').'/'.$brand->image))
+            {
                  File::delete(public_path('uploads/brands/').'/'.$brand->image);
+            }
+            if(File::exists(public_path('uploads/brands/thumbnail/').'/'.$brand->image))
+            {
+                 File::delete(public_path('uploads/brands/thumbnail/').'/'.$brand->image);
             }
             $image = $request->file('image');
             $file_extention = $request->file('image')->extension();
@@ -91,6 +96,10 @@ class AdminController extends Controller
         {
          File::delete(public_path('uploads/brands/').'/'.$brand->image);
         }
+        if(File::exists(public_path('uploads/brands/thumbnail/').'/'.$brand->image))
+        {
+             File::delete(public_path('uploads/brands/thumbnail/').'/'.$brand->image);
+        }
         $brand->delete();
         return redirect()->route('admin.brands')->with('status','Brand deleted successfully');
     }
@@ -98,6 +107,7 @@ class AdminController extends Controller
     //generate image thumbnail
     public function GenerateBrandThumbnailIsImage($image,$imageName)
     {
+        $destinationPathThumbnail = public_path('/uploads/brands/thumbnail');
         $destinationPath = public_path('/uploads/brands');
         if (!file_exists($destinationPath)) {
             mkdir($destinationPath, 0777, true);
@@ -111,6 +121,12 @@ class AdminController extends Controller
             $constraint->upsize();
         });
         $img->save($destinationPath.'/'.$imageName);
+
+        $img->resize(124,124,function($constraint){
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+        $img->save($destinationPathThumbnail.'/'.$imageName);
     }
 
     public function category()
@@ -161,8 +177,13 @@ class AdminController extends Controller
         $category->name = $request->name;
         $category->slug = Str::slug($request->name);
         if ($request->hasFile('image')) {
-            if(File::exists(public_path('uploads/categories/').'/'.$category->image)){
+            if(File::exists(public_path('uploads/categories/').'/'.$category->image))
+            {
                  File::delete(public_path('uploads/categories/').'/'.$category->image);
+            }
+            if(File::exists(public_path('uploads/categories/thumbnail/').'/'.$category->image))
+            {
+                 File::delete(public_path('uploads/categories/thumbnail/').'/'.$category->image);
             }
             $image = $request->file('image');
             $file_extention = $request->file('image')->extension();
@@ -182,6 +203,10 @@ class AdminController extends Controller
         {
             File::delete(public_path('uploads/categories/').'/'.$category->image);
         }
+        if(File::exists(public_path('uploads/categories/thumbnail/').'/'.$category->image))
+        {
+             File::delete(public_path('uploads/categories/thumbnail/').'/'.$category->image);
+        }
         $category->delete();
         return redirect()->route('admin.category')->with('status','Category deleted successfully');
     }
@@ -189,6 +214,7 @@ class AdminController extends Controller
     //generate image thumbnail
     public function GenerateCategoryThumbnailIsImage($image,$imageName)
     {
+        $destinationPathThumbnail = public_path('/uploads/categories/thumbnail');
         $destinationPath = public_path('/uploads/categories');
         if (!file_exists($destinationPath)) {
             mkdir($destinationPath, 0777, true);
@@ -202,6 +228,12 @@ class AdminController extends Controller
             $constraint->upsize();
         });
         $img->save($destinationPath.'/'.$imageName);
+
+        $img->resize(124,124,function($constraint){
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+        $img->save($destinationPathThumbnail.'/'.$imageName);
     }
 
     public function products()
@@ -274,32 +306,173 @@ class AdminController extends Controller
                 if($gcheck)
                 {
                     $gallery_iamges = $current_timestamp.".".$counter.'.'.$gextension;
-                    $this->GenerateProductThumbnailIsImage($file,$gallery_iamges);
+                    $this->GenerateProductThumbnailIsImage($file, $gallery_iamges, 'product-gallery');
                     array_push($gallery_arr,$gallery_iamges);
                     $counter = $counter + 1;
                 }
             }
             $gallery_iamges = implode(',',$gallery_arr);
+            $product->images = $gallery_iamges;
          }
-         $product->images = $gallery_iamges;
          $product->save();
          return redirect()->route('admin.products')->with('status','Product added successfully');
     }
 
-    public function GenerateProductThumbnailIsImage($image,$imageName)
+    public function edit_product($id)
     {
-        $destinationPath = public_path('/uploads/products');
+        $product = Product::findOrFail($id);
+        $categories = Category::select('id', 'name')->orderBy('name')->get();
+        $brands = Brand::select('id', 'name')->orderBy('name')->get();
+        return view('admin.edit-product',compact('product','categories','brands'));
+    }
+
+    public function update_product(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required|unique:products,slug,'.$request->id,
+            'short_description' => 'required',
+            'description' => 'required',
+            'regular_price' => 'required',
+            'sale_price' => 'required',
+            'SKU' => 'required',
+            'stock_status' => 'required',
+            'featured' => 'required',
+            'quantity' => 'required',
+            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'category_id' => 'required',
+            'brand_id' => 'required',
+        ]);
+
+        $product = Product::findOrFail($request->id);
+        $product->name = $request->name;
+        $product->slug = Str::slug($request->name);
+        $product->short_description = $request->short_description;
+        $product->description = $request->description;
+        $product->regular_price = $request->regular_price;
+        $product->sale_price = $request->sale_price;
+        $product->SKU = $request->SKU;
+        $product->stock_status = $request->stock_status;
+        $product->featured = $request->featured;
+        $product->quantity = $request->quantity;
+        $product->category_id = $request->category_id;
+        $product->brand_id = $request->brand_id;
+
+        $current_timestamp = Carbon::now()->timestamp;
+
+        if($request->hasFile('image'))
+        {
+            if(File::exists(public_path('uploads/products/').'/'.$product->image))
+            {
+                 File::delete(public_path('uploads/products/').'/'.$product->image);
+            }
+            if(File::exists(public_path('uploads/products/thumbnail/').'/'.$product->image))
+            {
+                 File::delete(public_path('uploads/products/thumbnail/').'/'.$product->image);
+            }
+            $image = $request->file('image');
+            $file_extention = $request->file('image')->extension();
+            $file_name = $current_timestamp.'.'.$file_extention;
+            $this->GenerateProductThumbnailIsImage($image,$file_name);
+            $product->image = $file_name;
+        }
+
+        $gallery_arr = array();
+        $gallery_iamges = "";
+        $counter = 1;
+
+        if($request->hasFile('images'))
+        {
+            foreach(explode(',',$product->images) as $img)
+            {
+                if(File::exists(public_path('uploads/product-gallery/').'/'.$img))
+                {
+                     File::delete(public_path('uploads/product-gallery/').'/'.$img);
+                }
+                if(File::exists(public_path('uploads/product-gallery/thumbnail/').'/'.$img))
+                {
+                     File::delete(public_path('uploads/product-gallery/thumbnail/').'/'.$img);
+                }
+            }
+
+            $allowedfileExtion = ['jpeg','png','jpg','gif','svg'];
+            $files = $request->file('images');
+            foreach($files as $file)
+            {
+                $gextension = $file->getClientOriginalExtension();
+                $gcheck = in_array($gextension,$allowedfileExtion);
+                if($gcheck)
+                {
+                    $gallery_iamges = $current_timestamp.".".$counter.'.'.$gextension;
+                    $this->GenerateProductThumbnailIsImage($file, $gallery_iamges, 'product-gallery');
+                    array_push($gallery_arr,$gallery_iamges);
+                    $counter = $counter + 1;
+                }
+            }
+            $gallery_iamges = implode(',',$gallery_arr);
+            $product->images = $gallery_iamges;
+         }
+         $product->save();
+         return redirect()->route('admin.products')->with('status','Product update successfully');
+    }
+
+    public function delete_product($id)
+    {
+        $product = Product::findOrFail($id);
+
+        if(File::exists(public_path('uploads/products/').'/'.$product->image))
+        {
+             File::delete(public_path('uploads/products/').'/'.$product->image);
+        }
+        if(File::exists(public_path('uploads/products/thumbnail/').'/'.$product->image))
+        {
+             File::delete(public_path('uploads/products/thumbnail/').'/'.$product->image);
+        }
+
+        foreach(explode(',',$product->images) as $img)
+        {
+            if(File::exists(public_path('uploads/product-gallery/').'/'.$img))
+            {
+                 File::delete(public_path('uploads/product-gallery/').'/'.$img);
+            }
+            if(File::exists(public_path('uploads/product-gallery/thumbnail/').'/'.$img))
+            {
+                 File::delete(public_path('uploads/product-gallery/thumbnail/').'/'.$img);
+            }
+        }
+
+        $product->delete();
+        return redirect()->route('admin.products')->with('status','Product has been deleted successfully');
+    }
+
+    public function GenerateProductThumbnailIsImage($image, $imageName, $folder = 'products')
+    {
+        $destinationPathThumbnail = public_path('/uploads/' . $folder . '/thumbnail');
+        $destinationPath = public_path('/uploads/' . $folder);
+
         if (!file_exists($destinationPath)) {
             mkdir($destinationPath, 0777, true);
         }
+
+        if (!file_exists($destinationPathThumbnail)) {
+            mkdir($destinationPathThumbnail, 0777, true);
+        }
+
         $manager = new ImageManager(new Driver());
 
         $img = $manager->read($image->getRealPath());
-        $img->cover(124,124,"top");
-        $img->resize(124,124,function($constraint){
+        $img->cover(540, 689, "top");
+        $img->resize(540, 689, function ($constraint) {
             $constraint->aspectRatio();
             $constraint->upsize();
         });
-        $img->save($destinationPath.'/'.$imageName);
+        $img->save($destinationPath . '/' . $imageName);
+
+        $img->resize(124, 124, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+        $img->save($destinationPathThumbnail . '/' . $imageName);
     }
+
 }
