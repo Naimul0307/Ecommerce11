@@ -47,8 +47,8 @@
                         <tr>
                             <th>Id</th>
                             <th>Name</th>
-                            <th>Price</th>
-                            <th>SalePrice</th>
+                            <th>Regular Price</th>
+                            <th>Sale Price</th>
                             <th>SKU</th>
                             <th>Category</th>
                             <th>Brand</th>
@@ -72,7 +72,7 @@
                                     <div class="text-tiny mt-3">{{ $product->slug }}</div>
                                 </div>
                             </td>
-                            <td>${{ $product->regulat_price }}</td>
+                            <td>${{ $product->regular_price }}</td>
                             <td>${{ $product->sale_price }}</td>
                             <td>{{ $product->SKU }}</td>
                             <td>{{ $product->category->name }}</td>
