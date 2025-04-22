@@ -169,12 +169,12 @@
                         <div class="body-title mb-10">Sale Price <span
                                 class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter sale price"
-                            name="sale_price" tabindex="0" value="{{ old('sale_price') }}" aria-required="true"
+                            name="sale_price" tabindex="0" value="{{ old('sale_price') }}"
                             required="">
                     </fieldset>
-                    @error('imsale_priceage')
+                    {{-- @error('imsale_priceage')
                     <span class="alert alert-danger text-center">{{ $message }}</span>
-                    @enderror
+                    @enderror --}}
                 </div>
 
 

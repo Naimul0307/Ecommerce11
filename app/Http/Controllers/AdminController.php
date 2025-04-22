@@ -36,7 +36,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:brands,slug',
-            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'mimes:jpg,jpeg,png,gif,svg,webp,bmp,tiff,ico,heic,jfif,avif|max:2048',
         ]);
 
         $brand = new Brand();
@@ -63,7 +63,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:brands,slug,'.$request->id,
-            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'mimes:jpg,jpeg,png,gif,svg,webp,bmp,tiff,ico,heic,jfif,avif|max:2048',
         ]);
 
         $brand = Brand::findOrFail($request->id);
@@ -145,7 +145,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:brands,slug',
-            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'mimes:jpg,jpeg,png,gif,svg,webp,bmp,tiff,ico,heic,jfif,avif|max:2048',
         ]);
         $category = new Category();
         $category->name = $request->name;
@@ -170,7 +170,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required',
             'slug' => 'required|unique:brands,slug,'.$request->id,
-            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'mimes:jpg,jpeg,png,gif,svg,webp,bmp,tiff,ico,heic,jfif,avif|max:2048',
         ]);
 
         $category = Category::findOrFail($request->id);
@@ -257,12 +257,11 @@ class AdminController extends Controller
             'short_description' => 'required',
             'description' => 'required',
             'regular_price' => 'required',
-            'sale_price' => 'required',
             'SKU' => 'required',
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
-            'image' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'mimes:jpg,jpeg,png,gif,svg,webp,bmp,tiff,ico,heic,jfif,avif|max:2048',
             'category_id' => 'required',
             'brand_id' => 'required',
         ]);
@@ -334,12 +333,11 @@ class AdminController extends Controller
             'short_description' => 'required',
             'description' => 'required',
             'regular_price' => 'required',
-            'sale_price' => 'required',
             'SKU' => 'required',
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
-            'image' => 'mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'mimes:jpg,jpeg,png,gif,svg,webp,bmp,tiff,ico,heic,jfif,avif|max:2048',
             'category_id' => 'required',
             'brand_id' => 'required',
         ]);
